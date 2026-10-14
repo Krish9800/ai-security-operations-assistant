@@ -1,0 +1,65 @@
+[
+  {
+    "alert_id": "ALT-DEMO-001",
+    "title": "SQL Injection Exploit on Public API",
+    "source": "waf",
+    "severity": "high",
+    "timestamp": "2026-10-14T08:00:00Z",
+    "source_ip": "198.51.100.42",
+    "destination_ip": "10.0.1.50",
+    "details": {
+      "uri": "/api/v1/users?id=1' OR 1=1--",
+      "payload": "' OR 1=1--"
+    },
+    "iocs": [
+      {
+        "type": "ip",
+        "value": "198.51.100.42",
+        "reputation_score": 0.88,
+        "context": "Known bulletproof hosting scanner"
+      }
+    ]
+  },
+  {
+    "alert_id": "ALT-DEMO-002",
+    "title": "Lateral Movement via PsExec Execution",
+    "source": "edr",
+    "severity": "critical",
+    "timestamp": "2026-10-14T08:15:00Z",
+    "host": "SRV-APP-PROD-01",
+    "username": "svc_dbadmin",
+    "source_ip": "10.0.1.50",
+    "details": {
+      "process": "psexec.exe",
+      "command_line": "psexec.exe \\\\SRV-APP-PROD-01 -u svc_dbadmin powershell.exe -enc ..."
+    },
+    "iocs": [
+      {
+        "type": "ip",
+        "value": "10.0.1.50",
+        "reputation_score": 0.60
+      }
+    ]
+  },
+  {
+    "alert_id": "ALT-DEMO-003",
+    "title": "Outbound Data Exfiltration Upload",
+    "source": "firewall",
+    "severity": "critical",
+    "timestamp": "2026-10-14T08:30:00Z",
+    "source_ip": "10.0.1.50",
+    "destination_ip": "203.0.113.88",
+    "details": {
+      "bytes_sent": 251658240,
+      "protocol": "HTTPS"
+    },
+    "iocs": [
+      {
+        "type": "ip",
+        "value": "203.0.113.88",
+        "reputation_score": 0.95,
+        "context": "Suspected adversary C2 drop point"
+      }
+    ]
+  }
+]

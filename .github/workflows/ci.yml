@@ -1,0 +1,54 @@
+name: CI Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test-security:
+    name: Code Quality, Type Safety, Security & Test Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Ruff Code Formatting Check
+        run: |
+          ruff format --check
+
+      - name: Ruff Lint Check
+        run: |
+          ruff check
+
+      - name: Mypy Strict Type Checking
+        run: |
+          mypy --strict src tests
+
+      - name: Bandit SAST Security Audit
+        run: |
+          bandit -r src/
+
+      - name: Pytest with 90%+ Coverage Gate
+        run: |
+          pytest --cov --cov-fail-under=90

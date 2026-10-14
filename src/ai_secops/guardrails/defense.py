@@ -12,7 +12,8 @@ class SecOpsGuardrail:
     # Patterns indicating prompt hijacking and system prompt override attempts
     PROMPT_INJECTION_PATTERNS: ClassVar[list[tuple[str, str]]] = [
         (
-            r"ignore\s+(all\s+)?(previous|prior|above)\s+(instructions|prompts|directions)",
+            r"(ignore|disregard|override|forget)\s+(all\s+)?(previous|prior|above|existing)?"
+            r"\s*(instructions|prompts|directions|rules|guidelines|safety|system|guardrail)",
             "System Prompt Override (Ignore Prior Instructions)",
         ),
         (
@@ -24,7 +25,8 @@ class SecOpsGuardrail:
             "Persona Hijacking / Jailbreak Attempt",
         ),
         (
-            r"(reveal|print|leak|output|dump)\s+(the\s+)?(system\s+prompt|developer\s+mode|hidden\s+rules)",
+            r"(reveal|print|leak|output|dump)\s+(the\s+)?(hidden\s+|internal\s+)?"
+            r"(system\s+prompt|developer\s+mode|hidden\s+rules|secret\s+key)",
             "System Prompt Extraction Attempt",
         ),
         (
