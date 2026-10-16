@@ -12,6 +12,7 @@ from rich.table import Table
 
 from ai_secops.config.settings import get_settings
 from ai_secops.db.sqlite import DatabaseEngine
+from ai_secops.guardrails.benchmark import AdversarialBenchmarkSuite
 from ai_secops.guardrails.defense import SecOpsGuardrail
 from ai_secops.hunter.planner import ThreatHuntingPlanner
 from ai_secops.models.enums import MessageRole, SIEMTarget
@@ -304,6 +305,30 @@ def chat(
         )
 
         console.print(f"\n[bold green]Copilot:[/bold green]\n{reply}\n")
+
+
+@app.command()
+def benchmark() -> None:
+    """Run adversarial prompt injection and guardrail benchmark evaluation."""
+    suite = AdversarialBenchmarkSuite()
+    report = suite.run()
+
+    table = Table(title="SecOps Guardrail Adversarial Benchmark")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="magenta")
+
+    table.add_row("Total Test Cases", str(report.total_cases))
+    table.add_row("Adversarial Attacks Evaluated", str(report.adversarial_cases))
+    table.add_row("Benign Security Prompts", str(report.benign_cases))
+    table.add_row("True Positives (Attacks Blocked)", str(report.true_positives))
+    table.add_row("False Positives (Benign Flagged)", str(report.false_positives))
+    table.add_row("Accuracy", f"{report.accuracy * 100:.1f}%")
+    table.add_row("True Positive Rate (TPR)", f"{report.true_positive_rate * 100:.1f}%")
+    table.add_row("False Positive Rate (FPR)", f"{report.false_positive_rate * 100:.1f}%")
+    table.add_row("Avg Adversarial Risk Score", f"{report.avg_adversarial_risk:.2f}")
+    table.add_row("Avg Benign Risk Score", f"{report.avg_benign_risk:.2f}")
+
+    console.print(table)
 
 
 @app.command()
